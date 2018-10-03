@@ -43,13 +43,26 @@ k4 = f3*cos(alpha1) + d2*cos(alpha1);
 
 r = x^2 + y^2 + z^2;
 
-% 关于 theta3 的方程
-eq = (r - k3)^2 / (4*a1^2) + (z - k4)^2 / sin(alpha1)^2 == k1^2 + k2^2;
-
-% 代入万能公式，解 theta3
+% 关于 theta3 的方程，代入万能公式，解 theta3
 syms u;
+eq = (r - k3)^2 / (4*a1^2) + (z - k4)^2 / sin(alpha1)^2 == k1^2 + k2^2;
 eq = subs(eq, s3, 2*u / (1 + u^2));
 eq = subs(eq, c3, (1 - u^2) / (1 + u^2));
 u = solve(eq, u);
-theta3 = 2*atan(u);
-simplify(theta3)
+theta3 = simplify(2*atan(u));
+
+% 解 theta2
+syms u;
+eq = r == 2*a1*(k1*c2 + k2*s2) + k3;
+eq = subs(eq, s2, 2*u / (1 + u^2));
+eq = subs(eq, c2, (1 - u^2) / (1 + u^2));
+u = solve(eq, u);
+theta2 = simplify(2*atan(u));
+
+% 解 theta1
+syms u;
+eq = x == g1*c1 - g2*s1;
+eq = subs(eq, s1, 2*u / (1 + u^2));
+eq = subs(eq, c1, (1 - u^2) / (1 + u^2));
+u = solve(eq, u);
+theta1 = simplify(2*atan(u));
