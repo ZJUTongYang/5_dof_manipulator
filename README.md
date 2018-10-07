@@ -40,10 +40,12 @@
 
 - [机器人学一（Robotics 1）](https://zh.coursera.org/learn/robotics1)
 
+- [机器人启蒙（七）——PUMA560 运动正逆解教你重新做人！](http://blog.sina.com.cn/s/blog_131fa47b20102whij.html)
+
 
 
 ## TODO List
 
-- [ ] 完成后 2 关节的逆运动学求解
+- [x] 完成后 2 关节的逆运动学求解
 
 - [ ] 将逆运动学求解过程封装为函数，方便调用
