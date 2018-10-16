@@ -5,15 +5,30 @@ a1 = 3;
 a2 = 96;
 a3 = 96;
 
-% 末端位姿
-nx = 0; ox = 0; ax = 1; px = 100;
-ny = 0; oy = 1; ay = 0; py = 100;
-nz = -1; oz = 0; az = 0; pz = 28;
+% 目标物体的位姿
+nx_g = 0; ox_g = 1; ax_g = 0; px_g = 0;
+ny_g = 1; oy_g = 0; ay_g = 0; py_g = 200;
+nz_g = 0; oz_g = 0; az_g = 1; pz_g = 100;
+G = [nx_g ox_g ax_g px_g;
+     ny_g oy_g ay_g py_g;
+     nz_g oz_g az_g pz_g;
+     0    0    0    1  ];
 
-T = [nx ox ax px ;
-     ny oy ay py ;
-     nz oz az pz ;
-     0  0  0  1 ];
+% 世界坐标系到基坐标系的变换
+T0 = [1 0 0 0 ;
+      0 1 0 0 ;
+      0 0 1 72;
+      0 0 0 1];
+% 末端坐标系到目标物体坐标系的变换
+Tg = [0 0  1 0  ;
+      0 -1 0 0  ;
+      1 0  0 100;
+      0 0  0 1 ];
+% 基坐标系到末端坐标系的变换
+T = T0^(-1)*G*Tg^(-1);
+nx = T(1, 1); ox = T(1, 2); ax = T(1, 3); px = T(1, 4);
+ny = T(2, 1); oy = T(2, 2); ay = T(2, 3); py = T(2, 4);
+nz = T(3, 1); oz = T(3, 2); az = T(3, 3); pz = T(3, 4);
 
 % 逆运动学的解
 theta3 = [
@@ -83,5 +98,6 @@ L4 = RevoluteMDH('alpha', 0, 'a', a3, 'd', 0);
 L5 = RevoluteMDH('alpha', -pi/2, 'a', 0, 'd', 0);
 
 arm = SerialLink([L1 L2 L3 L4 L5], 'name', 'Manipulator');
-theta = [t1 t2 t3 t4-pi/2 t5];
+theta = [t1 t2 t3 t4 t5];
+% theta = [0 0 0 0 0];
 arm.plot(theta, 'workspace', [-400 400 -400 400 0 400]);
