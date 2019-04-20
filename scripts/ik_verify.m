@@ -1,14 +1,14 @@
 clear, clc;
 
 % Position
-px_g = 50;
-py_g = 150;  
-pz_g = 100;
+px_g = 100;
+py_g = 50;  
+pz_g = 150;
 
 % RPY
 a = 0;
 b = pi/4;
-c = atan(py_g/px_g);  % 5 自由度限制
+c = atan2(py_g, px_g);  % 5 自由度限制
 
 % RPY 角转四元数 (Quaternion)
 w = cos(a/2)*cos(b/2)*cos(c/2) + sin(a/2)*sin(b/2)*sin(c/2);
@@ -67,7 +67,11 @@ theta3 = [
 
     2*atan((-(a1^4 + a2^4 + a3^4 + px^4 + py^4 + pz^4 - 2*a1^2*a2^2 - 2*a1^2*a3^2 - 2*a2^2*a3^2 - 2*a1^2*px^2 - 2*a2^2*px^2 - 2*a3^2*px^2 - 2*a1^2*py^2 - 2*a2^2*py^2 - 2*a3^2*py^2 + 2*a1^2*pz^2 - 2*a2^2*pz^2 - 2*a3^2*pz^2 + 2*px^2*py^2 + 2*px^2*pz^2 + 2*py^2*pz^2 + 8*a1*a2*a3*(px^2 + py^2)^(1/2))/((px^2 + py^2)*(- 2*a1^2 - 2*a2^2 + 4*a2*a3 - 2*a3^2 + px^2 + py^2 + 2*pz^2) - 4*a2*a3^3 - 4*a2^3*a3 + a1^4 + a2^4 + a3^4 + pz^4 - 2*a1^2*a2^2 - 2*a1^2*a3^2 + 6*a2^2*a3^2 + 2*a1^2*pz^2 - 2*a2^2*pz^2 - 2*a3^2*pz^2 + 4*a1^2*a2*a3 + 4*a2*a3*pz^2))^(1/2))
 ];
-t3 = real(theta3(1));
+if py_g >= 0
+    t3 = real(theta3(1));
+else
+    t3 = real(theta3(2));
+end
 s3 = sin(t3);
 c3 = cos(t3);
 
