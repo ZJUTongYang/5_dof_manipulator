@@ -1,14 +1,41 @@
 clear, clc;
 
+% Position
+px_g = 50;
+py_g = 150;  
+pz_g = 100;
+
+% RPY
+a = 0;
+b = pi/4;
+c = atan(py_g/px_g);  % 5 自由度限制
+
+% RPY 角转四元数 (Quaternion)
+w = cos(a/2)*cos(b/2)*cos(c/2) + sin(a/2)*sin(b/2)*sin(c/2);
+x = cos(b/2)*cos(c/2)*sin(a/2) - cos(a/2)*sin(b/2)*sin(c/2);
+y = cos(a/2)*cos(c/2)*sin(b/2) + cos(b/2)*sin(a/2)*sin(c/2);
+z = cos(a/2)*cos(b/2)*sin(c/2) - cos(c/2)*sin(a/2)*sin(b/2);
+
+% 四元数 (Quaternion) 转旋转矩阵
+nx_g = w^2 + x^2 - y^2 - z^2;
+ox_g = 2*x*y - 2*w*z;
+ax_g = 2*x*z + 2*w*y;
+ny_g = 2*x*y + 2*w*z;
+oy_g = w^2 - x^2 + y^2 - z^2;
+ay_g = 2*y*z - 2*w*x;
+nz_g = 2*x*z - 2*w*y;
+oz_g = 2*y*z + 2*w*x;
+az_g = w^2 - x^2 - y^2 + z^2;
+
 % 连杆参数，单位：mm
 a1 = 3;
 a2 = 96;
 a3 = 96;
 
 % 目标物体的位姿
-nx_g = 0; ox_g = 1; ax_g = 0; px_g = 0;
-ny_g = 1; oy_g = 0; ay_g = 0; py_g = 200;
-nz_g = 0; oz_g = 0; az_g = 1; pz_g = 100;
+% nx_g = 0; ox_g = 1; ax_g = 0; px_g = 0;
+% ny_g = 1; oy_g = 0; ay_g = 0; py_g = 200;
+% nz_g = 0; oz_g = 0; az_g = 1; pz_g = 100;
 G = [nx_g ox_g ax_g px_g;
      ny_g oy_g ay_g py_g;
      nz_g oz_g az_g pz_g;
@@ -22,7 +49,7 @@ T0 = [1 0 0 0 ;
 % 坐标系 5 到末端执行器坐标系的变换
 Tt = [0 0  1 0  ;
       0 -1 0 0  ;
-      1 0  0 100;
+      1 0  0 120;
       0 0  0 1 ];
 % 基坐标系到坐标系 5 的变换
 T = T0^(-1)*G*Tt^(-1);
