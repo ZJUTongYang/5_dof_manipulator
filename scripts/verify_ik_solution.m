@@ -1,3 +1,5 @@
+% 验证逆运动学的解
+
 clear, clc;
 
 % Robotics Toolbox for MATLAB
@@ -8,6 +10,7 @@ L4 = RevoluteMDH('alpha', 0,     'a', 96, 'd', 0);
 L5 = RevoluteMDH('alpha', -pi/2, 'a', 0,  'd', 0);
 
 arm = SerialLink([L1 L2 L3 L4 L5], 'name', 'xArm');
+
 % 初始姿态
 % init = [0 0 0 -pi/2 0];
 % arm.plot(init, 'workspace', [-400 400 -400 400 0 400]);

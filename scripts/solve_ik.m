@@ -24,23 +24,6 @@ end
 % 五自由度的限制
 yaw = atan(y/x);
 
-% RPY 角 -> 四元数 (Quaternion)
-qw = cos(roll/2)*cos(pitch/2)*cos(yaw/2) + sin(roll/2)*sin(pitch/2)*sin(yaw/2);
-qx = cos(pitch/2)*cos(yaw/2)*sin(roll/2) - cos(roll/2)*sin(pitch/2)*sin(yaw/2);
-qy = cos(roll/2)*cos(yaw/2)*sin(pitch/2) + cos(pitch/2)*sin(roll/2)*sin(yaw/2);
-qz = cos(roll/2)*cos(pitch/2)*sin(yaw/2) - cos(yaw/2)*sin(roll/2)*sin(pitch/2);
-
-% 四元数 -> 旋转矩阵
-nx_g = qw^2 + qx^2 - qy^2 - qz^2;
-ox_g = 2*qx*qy - 2*qw*qz;
-ax_g = 2*qx*qz + 2*qw*qy;
-ny_g = 2*qx*qy + 2*qw*qz;
-oy_g = qw^2 - qx^2 + qy^2 - qz^2;
-ay_g = 2*qy*qz - 2*qw*qx;
-nz_g = 2*qx*qz - 2*qw*qy;
-oz_g = 2*qy*qz + 2*qw*qx;
-az_g = qw^2 - qx^2 - qy^2 + qz^2;
-
 % 连杆参数，单位：mm
 a1 = 3;
 a2 = 96;
@@ -49,10 +32,10 @@ base_height = 72;   % 基座高度
 tool_length = 120;  % 末端执行器长度
 
 % 末端执行器位姿矩阵
-G = [nx_g ox_g ax_g x ;
-     ny_g oy_g ay_g y ;
-     nz_g oz_g az_g z ;
-     0    0    0    1];
+G = rpy2tr(roll, pitch, yaw);
+G(1, 4) = x;
+G(2, 4) = y;
+G(3, 4) = z;
 
 % 世界坐标系到基坐标系的变换
 T0 = [1 0 0 0          ;

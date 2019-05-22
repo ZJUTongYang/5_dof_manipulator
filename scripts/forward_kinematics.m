@@ -1,3 +1,5 @@
+% 正运动学方程
+
 clear, clc;
 
 syms pi theta1 theta2 theta3 theta4 theta5 a1 a2 a3;
