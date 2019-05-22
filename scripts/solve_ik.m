@@ -1,28 +1,55 @@
-function positions = solve_ik(x, y, z, roll, pitch)
+function positions = solve_ik(varargin)
 %SOLVE_IK    求解五自由度机械臂逆运动学方程
+%   solve_ik(G) 求解给定齐次变换矩阵 G 时，五自由度机械臂各个关节的关节变量。
+%
+%   solve_ik(x, y, z) 求解给定世界坐标系下位置 (x, y, z) 时，五自由度机械臂各个
+%   关节的关节变量。
+%
 %   solve_ik(x, y, z, roll, pitch) 求解给定世界坐标系下位置 (x, y, z) 和 RPY
-%   角表示的姿态时，五自由度机械臂各个关节的关节变量。位置的单位为毫米 (mm)，姿态的单
-%   位为弧度 (rad)。
+%   角表示的姿态时，五自由度机械臂各个关节的关节变量。
 %
 %   由于机械臂只有五个自由度，因此受其结构限制，偏航角 (yaw) 通过位置计算得到。
 %
+%   位置的单位为毫米 (mm)，姿态的单位为弧度 (rad)。
+%
 %   示例
+%      theta = solve_ik(G);
 %      theta = solve_ik(160, 0, 160);
 %      theta = solve_ik(120, 0, 20, 0, pi/2.5);
 
 
 % 检查参数数量，必须输入位置，姿态默认值为 0
-if nargin < 3
-    error('参数不足！');
+if nargin == 1
+    G = varargin{1};
+    y = G(2, 4);
 elseif nargin == 3
-    roll = 0;
-    pitch = 0;
+    x = varargin{1};
+    y = varargin{2};
+    z = varargin{3};
+    G = rpy2tr(0, 0, atan(y/x));
+    G(1, 4) = x;
+    G(2, 4) = y;
+    G(3, 4) = z;
 elseif nargin == 4
-    pitch = 0;
+    x = varargin{1};
+    y = varargin{2};
+    z = varargin{3};
+    roll = varargin{4};
+    G = rpy2tr(roll, 0, atan(y/x));
+    G(1, 4) = x;
+    G(2, 4) = y;
+    G(3, 4) = z;
+elseif nargin == 5
+    x = varargin{1};
+    y = varargin{2};
+    z = varargin{3};
+    roll = varargin{4};
+    pitch = varargin{5};
+    G = rpy2tr(roll, pitch, atan(y/x));
+    G(1, 4) = x;
+    G(2, 4) = y;
+    G(3, 4) = z;
 end
-
-% 五自由度的限制
-yaw = atan(y/x);
 
 % 连杆参数，单位：mm
 a1 = 3;
@@ -30,12 +57,6 @@ a2 = 96;
 a3 = 96;
 base_height = 72;   % 基座高度
 tool_length = 120;  % 末端执行器长度
-
-% 末端执行器位姿矩阵
-G = rpy2tr(roll, pitch, yaw);
-G(1, 4) = x;
-G(2, 4) = y;
-G(3, 4) = z;
 
 % 世界坐标系到基坐标系的变换
 T0 = [1 0 0 0          ;
