@@ -1,22 +1,22 @@
 clear, clc;
 
-% Position
+% 末端执行器位姿
+% 位置
 px_g = 100;
-py_g = 50;  
-pz_g = 150;
+py_g = 0;  
+pz_g = 20;
+% 姿态（RPY 角）
+a = 0;                % Roll，X 轴
+b = pi/2.5;           % Pitch，Y 轴
+c = atan(py_g/px_g);  % Yaw，Z 轴（5 自由度限制）
 
-% RPY
-a = 0;
-b = pi/4;
-c = atan2(py_g, px_g);  % 5 自由度限制
-
-% RPY 角转四元数 (Quaternion)
+% RPY 角 -> 四元数 (Quaternion)
 w = cos(a/2)*cos(b/2)*cos(c/2) + sin(a/2)*sin(b/2)*sin(c/2);
 x = cos(b/2)*cos(c/2)*sin(a/2) - cos(a/2)*sin(b/2)*sin(c/2);
 y = cos(a/2)*cos(c/2)*sin(b/2) + cos(b/2)*sin(a/2)*sin(c/2);
 z = cos(a/2)*cos(b/2)*sin(c/2) - cos(c/2)*sin(a/2)*sin(b/2);
 
-% 四元数 (Quaternion) 转旋转矩阵
+% 四元数 -> 旋转矩阵
 nx_g = w^2 + x^2 - y^2 - z^2;
 ox_g = 2*x*y - 2*w*z;
 ax_g = 2*x*z + 2*w*y;
@@ -31,26 +31,25 @@ az_g = w^2 - x^2 - y^2 + z^2;
 a1 = 3;
 a2 = 96;
 a3 = 96;
+base_height = 72;   % 基座高度
+tool_length = 120;  % 末端执行器长度
 
-% 目标物体的位姿
-% nx_g = 0; ox_g = 1; ax_g = 0; px_g = 0;
-% ny_g = 1; oy_g = 0; ay_g = 0; py_g = 200;
-% nz_g = 0; oz_g = 0; az_g = 1; pz_g = 100;
+% 末端执行器位姿矩阵
 G = [nx_g ox_g ax_g px_g;
      ny_g oy_g ay_g py_g;
      nz_g oz_g az_g pz_g;
      0    0    0    1  ];
 
 % 世界坐标系到基坐标系的变换
-T0 = [1 0 0 0 ;
-      0 1 0 0 ;
-      0 0 1 72;
-      0 0 0 1];
+T0 = [1 0 0 0          ;
+      0 1 0 0          ;
+      0 0 1 base_height;
+      0 0 0 1         ];
 % 坐标系 5 到末端执行器坐标系的变换
-Tt = [0 0  1 0  ;
-      0 -1 0 0  ;
-      1 0  0 120;
-      0 0  0 1 ];
+Tt = [0 0  1 0          ;
+      0 -1 0 0          ;
+      1 0  0 tool_length;
+      0 0  0 1         ];
 % 基坐标系到坐标系 5 的变换
 T = T0^(-1)*G*Tt^(-1);
 nx = T(1, 1); ox = T(1, 2); ax = T(1, 3); px = T(1, 4);
@@ -128,7 +127,10 @@ L3 = RevoluteMDH('alpha', 0, 'a', a2, 'd', 0);
 L4 = RevoluteMDH('alpha', 0, 'a', a3, 'd', 0);
 L5 = RevoluteMDH('alpha', -pi/2, 'a', 0, 'd', 0);
 
-arm = SerialLink([L1 L2 L3 L4 L5], 'name', 'Manipulator');
+arm = SerialLink([L1 L2 L3 L4 L5], 'name', 'xArm');
+% 初始姿态
+% init = [0 0 0 -pi/2 0];
+% arm.plot(init, 'workspace', [-400 400 -400 400 0 400]);
+% 逆解姿态
 theta = [t1 t2 t3 t4 t5];
-% theta = [0 0 0 0 0];
 arm.plot(theta, 'workspace', [-400 400 -400 400 0 400]);
