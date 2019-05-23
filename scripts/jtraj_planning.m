@@ -1,6 +1,7 @@
 % 关节空间中的轨迹规划
 
-close, clear, clc;
+close all;
+clear, clc;
 
 % Robotics Toolbox for MATLAB
 L1 = RevoluteMDH('alpha', 0,     'a', 0,  'd', 72);  %  加入沿 Z0 轴方向 72 mm 的偏移，为底座高度
@@ -13,9 +14,13 @@ arm = SerialLink([L1 L2 L3 L4 L5], 'name', 'xArm');
 
 step = 50;
 
+% 起点关节位置
 begin_angle = solve_ik(160, 120, 160);
+% 终点关节位置
 end_angle = solve_ik(120, 0 ,20, 0, pi/3);
+
 [Q, QD, QDD] = jtraj(begin_angle, end_angle, step);
+
 figure;
 subplot(3,1,1);
 plot(Q);
