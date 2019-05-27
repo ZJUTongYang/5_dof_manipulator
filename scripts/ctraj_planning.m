@@ -20,10 +20,10 @@ start_pose(1, 4) = 120;
 start_pose(2, 4) = 50;
 start_pose(3, 4) = 120;
 % 终点位姿
-end_pose = rpy2tr(0, pi/3, atan(0/100));
-end_pose(1, 4) = 100;
+end_pose = rpy2tr(0, pi/2.5, atan(0/100));
+end_pose(1, 4) = 150;
 end_pose(2, 4) = 0;
-end_pose(3, 4) = 100;
+end_pose(3, 4) = 10;
 
 TC = ctraj(start_pose, end_pose, step);
 T = transl(TC);
@@ -40,6 +40,29 @@ Q = zeros(step, 5);
 for i = 1:step
     Q(i, :) = solve_ik(TC(:, :, i));
 end
+QD = zeros(step, 5);
+QD(2:step, :) = diff(Q);
+QDD = diff(QD);
+
+figure;
+subplot(3,1,1);
+plot(Q);
+title('位置');
+xlabel('t');
+ylabel('Q');
+grid on;
+subplot(3,1,2);
+plot(QD);
+title('速度');
+xlabel('t');
+ylabel('QD');
+grid on;
+subplot(3,1,3);
+plot(QDD);
+title('加速度');
+xlabel('t');
+ylabel('QDD');
+grid on;
 
 figure;
 arm.plot(Q, 'workspace', [-300 300 -300 300 0 300]);
